@@ -69,4 +69,7 @@ app.MapControllers();
 app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow })
     .WithName("HealthCheck");
 
+app.MapGet("/", () => "Hello from Requete API!")
+    .WithName("Root");
+
 app.Run();
