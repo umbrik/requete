@@ -11,7 +11,7 @@ public class RequireSessionAttribute : ActionFilterAttribute
 
         if (sessionData == null)
         {
-            context.Result = new UnauthorizedObjectResult(new { error = "Session not found or expired" });
+            context.Result = new UnauthorizedObjectResult(new { error = Resources.SharedResource.SessionNotFoundOrExpired });
             return;
         }
 

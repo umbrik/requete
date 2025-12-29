@@ -1,10 +1,11 @@
 using System.Security.Claims;
-
 using requete.Services;
 
 namespace requete.Middleware;
 
-public class SessionAuthenticationMiddleware(RequestDelegate next, ILogger<SessionAuthenticationMiddleware> logger)
+public class SessionAuthenticationMiddleware(
+    RequestDelegate next,
+    ILogger<SessionAuthenticationMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
     private readonly ILogger<SessionAuthenticationMiddleware> _logger = logger;
@@ -13,23 +14,19 @@ public class SessionAuthenticationMiddleware(RequestDelegate next, ILogger<Sessi
     {
         if (!context.Request.Cookies.TryGetValue("SessionID", out var sessionId))
         {
-            _logger.LogInformation("No SessionID found in cookies");
             context.Response.StatusCode = 401;
+            await context.Response.WriteAsync(Resources.SharedResource.SessionNotFoundInCookies);
             return;
         }
-
-        _logger.LogInformation("Found SessionID in cookies: {SessionId}", sessionId);
 
         var sessionData = await redisService.GetSessionAsync(sessionId);
 
         if (sessionData == null)
         {
-            _logger.LogWarning("Session not found in Redis for session id: {SessionId}", sessionId);
             context.Response.StatusCode = 401;
+            await context.Response.WriteAsync(Resources.SharedResource.SessionNotFoundOrExpired);
             return;
         }
-
-        _logger.LogInformation("Session found in Redis for session id: {SessionId}", sessionId);
 
         var claims = new List<Claim>
         {
@@ -41,7 +38,6 @@ public class SessionAuthenticationMiddleware(RequestDelegate next, ILogger<Sessi
         context.User = new ClaimsPrincipal(identity);
         context.Items["SessionData"] = sessionData;
 
-        _logger.LogInformation("User authenticated with session id: {SessionId}", sessionId);
         await _next(context);
     }
 }

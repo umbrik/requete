@@ -9,10 +9,9 @@ namespace requete.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(AppDbContext context, ILogger<UsersController> logger) : ControllerBase
+public class UsersController(AppDbContext context) : ControllerBase
 {
     private readonly AppDbContext _context = context;
-    private readonly ILogger<UsersController> _logger = logger;
 
     [HttpGet("me")]
     [RequireSession]
@@ -27,7 +26,7 @@ public class UsersController(AppDbContext context, ILogger<UsersController> logg
 
         if (collaborator is null)
         {
-            return NotFound(new { error = "User not found" });
+            return NotFound(new { error = Resources.SharedResource.UserNotFound });
         }
 
         return Ok(new

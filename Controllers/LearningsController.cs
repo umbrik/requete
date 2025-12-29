@@ -9,10 +9,9 @@ namespace requete.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LearningsController(AppDbContext context, ILogger<LearningsController> logger) : ControllerBase
+public class LearningsController(AppDbContext context) : ControllerBase
 {
     private readonly AppDbContext _context = context;
-    private readonly ILogger<LearningsController> _logger = logger;
 
     [HttpGet("all")]
     [RequireSession]
