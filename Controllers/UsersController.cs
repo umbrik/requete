@@ -1,0 +1,40 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+using requete.Data;
+using requete.Models;
+using requete.Middleware;
+
+namespace requete.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController(AppDbContext context, ILogger<UsersController> logger) : ControllerBase
+{
+    private readonly AppDbContext _context = context;
+    private readonly ILogger<UsersController> _logger = logger;
+
+    [HttpGet("me")]
+    [RequireSession]
+    public async Task<ActionResult<object>> GetCurrentUser()
+    {
+        if (HttpContext.Items["SessionData"] is not SessionData sessionData)
+        {
+            return Unauthorized();
+        }
+
+        var collaborator = await _context.Collaborators.SingleOrDefaultAsync(e => e.Id == sessionData.UserId);
+
+        if (collaborator is null)
+        {
+            return NotFound(new { error = "User not found" });
+        }
+
+        return Ok(new
+        {
+            sessionId = sessionData.SessionId,
+            userId = sessionData.UserId.ToString(),
+            userFullname = collaborator.Fullname
+        });
+    }
+}
