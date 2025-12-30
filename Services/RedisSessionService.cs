@@ -23,7 +23,6 @@ public class RedisSessionService(IConnectionMultiplexer redis, ILogger<RedisSess
 
             if (!sessionData.HasValue)
             {
-                _logger.LogInformation("Session {SessionId} not found in Redis", sessionId);
                 return null;
             }
 
@@ -40,8 +39,6 @@ public class RedisSessionService(IConnectionMultiplexer redis, ILogger<RedisSess
 
                 userId = Convert.ToInt64(doc.Descendants("curUserID").FirstOrDefault()?.Value, 16);
                 userFullname = doc.Descendants("cur_user_fullname").FirstOrDefault()?.Value;
-
-                _logger.LogInformation("Successfully parsed XML for session {SessionId}", sessionId);
             }
             catch (Exception xmlEx)
             {
