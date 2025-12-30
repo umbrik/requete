@@ -19,7 +19,7 @@ var connectionString = dbProvider.ToLower() switch
     _ => builder.Configuration.GetConnectionString("DefaultConnection")
 };
 
-if (dbProvider.ToLower() == "postgresql")
+if (dbProvider.Equals("postgresql", StringComparison.OrdinalIgnoreCase))
 {
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
