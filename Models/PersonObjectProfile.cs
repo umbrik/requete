@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace requete.Models;
+
+[Table("person_object_profiles")]
+public partial class PersonObjectProfile
+{
+    [Key]
+    [Column("id")]
+    public long Id { get; set; }
+
+    [Column("code")]
+    [Unicode(false)]
+    public string? Code { get; set; }
+
+    [Column("name")]
+    [Unicode(false)]
+    public string? Name { get; set; }
+
+    [Column("object_catalog", TypeName = "xml")]
+    public string? ObjectCatalog { get; set; }
+
+    [Column("modification_date", TypeName = "datetime")]
+    public DateTime? ModificationDate { get; set; }
+}

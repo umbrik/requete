@@ -22,7 +22,7 @@ public class LearningsController(AppDbContext context) : ControllerBase
             return Unauthorized();
         }
 
-        var learnings = await _context.Learnings.ToListAsync();
+        var learnings = await _context.Set<Learning>().ToListAsync();
 
         return Ok(learnings);
     }
