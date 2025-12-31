@@ -22,7 +22,7 @@ public class UsersController(AppDbContext context) : ControllerBase
             return Unauthorized();
         }
 
-        var collaborator = await _context.Collaborators.SingleOrDefaultAsync(e => e.Id == sessionData.UserId);
+        var collaborator = await _context.Set<Collaborator>().SingleOrDefaultAsync(e => e.Id == sessionData.UserId);
 
         if (collaborator is null)
         {
