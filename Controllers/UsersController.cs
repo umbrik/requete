@@ -16,9 +16,9 @@ public class UsersController(AppDbContext context) : SessionControllerBase
 
     [HttpGet("me")]
     [RequireSession]
-    public async Task<ActionResult<object>> GetCurrentUser(SessionData sessionData)
+    public async Task<ActionResult<object>> GetCurrentUser()
     {
-        var collaborator = await _context.Set<Collaborator>().SingleOrDefaultAsync(e => e.Id == sessionData.UserId);
+        var collaborator = await _context.Set<Collaborator>().SingleOrDefaultAsync(e => e.Id == SessionData.UserId);
 
         if (collaborator is null)
         {
@@ -27,8 +27,8 @@ public class UsersController(AppDbContext context) : SessionControllerBase
 
         return Ok(new
         {
-            sessionId = sessionData.SessionId,
-            userId = sessionData.UserId.ToString(),
+            sessionId = SessionData.SessionId,
+            userId = SessionData.UserId.ToString(),
             userFullname = collaborator.Fullname
         });
     }
@@ -45,7 +45,7 @@ public class UsersController(AppDbContext context) : SessionControllerBase
             {
                 Id = x.PersonId,
                 Fullname = x.PersonFullname,
-                Position = x.PersonPosition.Name
+                Position = x.PersonPosition!.Name
             })
             .ToListAsync();
 

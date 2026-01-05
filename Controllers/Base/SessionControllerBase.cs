@@ -7,5 +7,5 @@ namespace requete.Controllers;
 [ApiController]
 public abstract class SessionControllerBase : ControllerBase
 {
-    protected SessionData? SessionData => HttpContext.Items["SessionData"] as SessionData;
+    protected SessionData SessionData => (HttpContext.Items["SessionData"] as SessionData)!;
 }
