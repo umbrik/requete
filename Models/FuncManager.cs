@@ -20,6 +20,8 @@ public partial class FuncManager
     [Column("object_id")]
     public long? ObjectId { get; set; }
 
+    public Collaborator? Object { get; set; }
+
     [Column("object_name")]
     [Unicode(false)]
     public string? ObjectName { get; set; }

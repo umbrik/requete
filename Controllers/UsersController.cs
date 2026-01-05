@@ -51,4 +51,23 @@ public class UsersController(AppDbContext context) : SessionControllerBase
 
         return Ok(managers);
     }
+
+    [HttpGet("subordinates")]
+    [RequireSession]
+    public async Task<ActionResult<object>> GetSubordinates()
+    {
+        var managers = await _context
+            .Set<FuncManager>()
+            .Where(x => x.PersonId == SessionData!.UserId)
+            .Include(x => x.Object)
+            .Select(x => new ManagerDto
+            {
+                Id = x.ObjectId,
+                Fullname = x.ObjectName,
+                Position = x.Object!.PositionName
+            })
+            .ToListAsync();
+
+        return Ok(managers);
+    }
 }
