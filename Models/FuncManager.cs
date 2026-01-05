@@ -37,6 +37,8 @@ public partial class FuncManager
     [Column("person_position_id")]
     public long? PersonPositionId { get; set; }
 
+    public Position? PersonPosition { get; set; }
+
     [Column("staff_object_type")]
     [Unicode(false)]
     public string? StaffObjectType { get; set; }
