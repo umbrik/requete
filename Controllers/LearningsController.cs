@@ -3,19 +3,25 @@ using Microsoft.EntityFrameworkCore;
 
 using requete.Data;
 using requete.Models;
+using requete.Services;
 
 namespace requete.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LearningsController(AppDbContext context) : SessionControllerBase
+public class LearningsController(ILearningService learningService) : SessionControllerBase
 {
-    private readonly AppDbContext _context = context;
+    private readonly ILearningService _learningService = learningService;
 
-    [HttpGet("all")]
-    public async Task<ActionResult<object>> GetAllLearnings()
+    [HttpGet]
+    public async Task<ActionResult<object>> GetLearnings()
     {
-        var learnings = await _context.Set<Learning>().Where(x => x.PersonId == SessionData.UserId).ToListAsync();
-        return Ok(learnings);
+        return Ok(await _learningService.GetUserLearnings(SessionData.UserId));
+    }
+
+    [HttpGet("subordinates")]
+    public async Task<ActionResult<object>> GetSubordinatesLearnings()
+    {
+        return Ok(await _learningService.GetUserSubordinatesLearnings(SessionData.UserId));
     }
 }

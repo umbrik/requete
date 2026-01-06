@@ -5,21 +5,22 @@ using requete.Data;
 using requete.Models;
 using requete.Middleware;
 using requete.DTOs.Responses;
+using requete.Services;
 
 namespace requete.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(AppDbContext context) : SessionControllerBase
+public class UsersController(IUserService userService) : SessionControllerBase
 {
-    private readonly AppDbContext _context = context;
+    private readonly IUserService _userService = userService;
 
     [HttpGet("me")]
     public async Task<ActionResult<object>> GetCurrentUser()
     {
-        var collaborator = await _context.Set<Collaborator>().SingleOrDefaultAsync(e => e.Id == SessionData.UserId);
+        var user = await _userService.GetUserDetails(SessionData.UserId);
 
-        if (collaborator is null)
+        if (user is null)
         {
             return NotFound(new { error = Resources.SharedResource.UserNotFound });
         }
@@ -28,43 +29,29 @@ public class UsersController(AppDbContext context) : SessionControllerBase
         {
             sessionId = SessionData.SessionId,
             userId = SessionData.UserId.ToString(),
-            userFullname = collaborator.Fullname
+            userFullname = user.Fullname
         });
     }
 
     [HttpGet("managers")]
     public async Task<ActionResult<object>> GetManagers()
     {
-        var managers = await _context
-            .Set<FuncManager>()
-            .Where(x => x.ObjectId == SessionData!.UserId)
-            .Include(x => x.PersonPosition)
-            .Select(x => new ManagerDto
-            {
-                Id = x.PersonId,
-                Fullname = x.PersonFullname,
-                Position = x.PersonPosition!.Name
-            })
-            .ToListAsync();
-
-        return Ok(managers);
+        return Ok((await _userService.GetManagers(SessionData.UserId)).Select(x => new UserDto
+        {
+            Id = x.ObjectId,
+            Fullname = x.PersonFullname,
+            Position = x.PersonPosition?.Name
+        }));
     }
 
     [HttpGet("subordinates")]
     public async Task<ActionResult<object>> GetSubordinates()
     {
-        var managers = await _context
-            .Set<FuncManager>()
-            .Where(x => x.PersonId == SessionData!.UserId)
-            .Include(x => x.Object)
-            .Select(x => new ManagerDto
-            {
-                Id = x.ObjectId,
-                Fullname = x.ObjectName,
-                Position = x.Object!.PositionName
-            })
-            .ToListAsync();
-
-        return Ok(managers);
+        return Ok((await _userService.GetSubordinates(SessionData.UserId)).Select(x => new UserDto
+        {
+            Id = x.ObjectId,
+            Fullname = x.PersonFullname,
+            Position = x.PersonPosition?.Name
+        }));
     }
 }
