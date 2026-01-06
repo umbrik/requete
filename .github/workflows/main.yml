@@ -1,0 +1,145 @@
+name: Main
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dotnet-version: ['10.0.x']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Restore dependencies
+      run: dotnet restore requete.sln
+
+    - name: Build solution
+      run: dotnet build requete.sln --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test requete.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Upload coverage reports
+      if: success()
+      uses: codecov/codecov-action@v3
+      with:
+        files: '**/coverage.cobertura.xml'
+        fail_ci_if_error: false
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore requete.sln
+
+    - name: Format check
+      run: dotnet format requete.sln --verify-no-changes --verbosity diagnostic
+
+    - name: Analyze code
+      run: dotnet build requete.sln --configuration Release --verbosity normal
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore requete.sln
+
+    - name: List packages for vulnerability scan
+      run: dotnet list package --vulnerable --include-transitive
+
+    - name: Check for known vulnerabilities
+      run: dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-scan.log && ! grep -q "has the following vulnerable packages" vulnerability-scan.log
+
+  multi-os-compatibility:
+    name: Multi-OS Build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet-version: ['10.0.x']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Restore dependencies
+      run: dotnet restore requete.sln
+
+    - name: Build
+      run: dotnet build requete.sln --configuration Release --no-restore
+
+  pr-summary:
+    name: PR Summary
+    needs: [build-and-test, code-quality, security-scan, multi-os-compatibility]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Check all jobs status
+      run: |
+        if [[ "${{ needs.build-and-test.result }}" == "success" &&
+              "${{ needs.code-quality.result }}" == "success" &&
+              "${{ needs.security-scan.result }}" == "success" &&
+              "${{ needs.multi-os-compatibility.result }}" == "success" ]]; then
+          echo "✅ All PR checks passed successfully!"
+          exit 0
+        else
+          echo "❌ Some PR checks failed:"
+          echo "Build and Test: ${{ needs.build-and-test.result }}"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Security Scan: ${{ needs.security-scan.result }}"
+          echo "Multi-OS Build: ${{ needs.multi-os-compatibility.result }}"
+          exit 1
+        fi
