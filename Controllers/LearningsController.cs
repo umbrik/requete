@@ -3,27 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 using requete.Data;
 using requete.Models;
-using requete.Middleware;
 
 namespace requete.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LearningsController(AppDbContext context) : ControllerBase
+public class LearningsController(AppDbContext context) : SessionControllerBase
 {
     private readonly AppDbContext _context = context;
 
     [HttpGet("all")]
-    [RequireSession]
     public async Task<ActionResult<object>> GetAllLearnings()
     {
-        if (HttpContext.Items["SessionData"] is not SessionData sessionData)
-        {
-            return Unauthorized();
-        }
-
-        var learnings = await _context.Set<Learning>().ToListAsync();
-
+        var learnings = await _context.Set<Learning>().Where(x => x.PersonId == SessionData.UserId).ToListAsync();
         return Ok(learnings);
     }
 }

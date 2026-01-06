@@ -15,7 +15,6 @@ public class UsersController(AppDbContext context) : SessionControllerBase
     private readonly AppDbContext _context = context;
 
     [HttpGet("me")]
-    [RequireSession]
     public async Task<ActionResult<object>> GetCurrentUser()
     {
         var collaborator = await _context.Set<Collaborator>().SingleOrDefaultAsync(e => e.Id == SessionData.UserId);
@@ -34,7 +33,6 @@ public class UsersController(AppDbContext context) : SessionControllerBase
     }
 
     [HttpGet("managers")]
-    [RequireSession]
     public async Task<ActionResult<object>> GetManagers()
     {
         var managers = await _context
@@ -53,7 +51,6 @@ public class UsersController(AppDbContext context) : SessionControllerBase
     }
 
     [HttpGet("subordinates")]
-    [RequireSession]
     public async Task<ActionResult<object>> GetSubordinates()
     {
         var managers = await _context
