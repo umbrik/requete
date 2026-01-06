@@ -3,15 +3,39 @@ using requete.Services;
 
 namespace requete.Middleware;
 
-public class SessionAuthenticationMiddleware(
-    RequestDelegate next,
-    ILogger<SessionAuthenticationMiddleware> logger)
+public class SessionAuthenticationMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
-    private readonly ILogger<SessionAuthenticationMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context, IRedisSessionService redisService)
     {
+        if (context.Request.Path.Value?.Contains("favicon.ico") == true)
+        {
+            await _next(context);
+            return;
+        }
+
+        if (HttpMethods.IsOptions(context.Request.Method))
+        {
+            await _next(context);
+            return;
+        }
+
+        var endpoint = context.GetEndpoint();
+
+        if (endpoint is null)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync(Resources.SharedResource.EndpointNotFound);
+            return;
+        }
+
+        if (endpoint?.Metadata.GetMetadata<Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute>() != null)
+        {
+            await _next(context);
+            return;
+        }
+
         if (!context.Request.Cookies.TryGetValue("SessionID", out var sessionId))
         {
             context.Response.StatusCode = 401;
@@ -39,13 +63,5 @@ public class SessionAuthenticationMiddleware(
         context.Items["SessionData"] = sessionData;
 
         await _next(context);
-    }
-}
-
-public static class SessionAuthenticationMiddlewareExtensions
-{
-    public static IApplicationBuilder UseSessionAuthentication(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<SessionAuthenticationMiddleware>();
     }
 }

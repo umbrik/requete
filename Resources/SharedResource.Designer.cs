@@ -61,7 +61,16 @@ namespace requete.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not found.
+        ///   Looks up a localized string similar to Endpoint not found.
+        /// </summary>
+        public static string EndpointNotFound {
+            get {
+                return ResourceManager.GetString("EndpointNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Session not found in cookies. You need to pass cookie &quot;SessionID&quot;.
         /// </summary>
         public static string SessionNotFoundInCookies {
             get {

@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+
 using StackExchange.Redis;
+using Scalar.AspNetCore;
+
 using requete.Data;
 using requete.Services;
 using requete.Middleware;
-using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,16 +62,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-
-app.UseSessionAuthentication();
+app.UseRouting();
+app.UseMiddleware<SessionAuthenticationMiddleware>();
 
 app.UseAuthorization();
 app.MapControllers();
-
-app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow })
-    .WithName("HealthCheck");
-
-app.MapGet("/", () => "Hello from Requete API!")
-    .WithName("Root");
 
 app.Run();
