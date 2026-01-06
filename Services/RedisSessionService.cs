@@ -53,7 +53,7 @@ public class RedisSessionService(IConnectionMultiplexer redis, ILogger<RedisSess
 
             return new SessionData
             {
-                SessionId = long.Parse(sessionId),
+                SessionId = Int128.Parse(sessionId),
                 UserId = userId!.Value,
                 UserFullname = userFullname
             };
