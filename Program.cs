@@ -4,8 +4,8 @@ using StackExchange.Redis;
 using Scalar.AspNetCore;
 
 using requete.Data;
-using requete.Services;
 using requete.Middleware;
+using requete.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,10 +40,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(configuration);
 });
 
-builder.Services.AddScoped<IRedisSessionService, RedisSessionService>();
-builder.Services.AddScoped<ILearningService, LearningService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddProjectServices();
 
 builder.Services.AddCors(options =>
 {
