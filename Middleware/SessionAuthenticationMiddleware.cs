@@ -6,10 +6,16 @@ namespace requete.Middleware;
 public class SessionAuthenticationMiddleware(RequestDelegate next)
 {
     private readonly RequestDelegate _next = next;
+    private readonly string[] whiteList =
+    [
+        "favicon.ico",
+        "/scalar/v1",
+        "/openapi/v1.json",
+    ];
 
     public async Task InvokeAsync(HttpContext context, IRedisSessionService redisService)
     {
-        if (context.Request.Path.Value?.Contains("favicon.ico") == true)
+        if (whiteList.Any(path => context.Request.Path.Value?.Contains(path) == true))
         {
             await _next(context);
             return;
