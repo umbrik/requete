@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using requete.DTOs.Responses;
-using requete.Models;
+using requete.Models.HCM;
 using requete.Services;
 
 namespace requete.Controllers;
@@ -33,22 +33,12 @@ public class UsersController(IUserService userService) : SessionControllerBase
     [HttpGet("managers")]
     public async Task<ActionResult<object>> GetManagers()
     {
-        return Ok((await _userService.GetManagers(SessionData.UserId)).Select(x => new UserDto
-        {
-            Id = x.ObjectId,
-            Fullname = x.PersonFullname,
-            Position = x.PersonPosition?.Name
-        }));
+        return Ok((await _userService.GetManagers(SessionData.UserId)).Select(x => new UserDto(x)));
     }
 
     [HttpGet("subordinates")]
     public async Task<ActionResult<object>> GetSubordinates()
     {
-        return Ok((await _userService.GetSubordinates(SessionData.UserId)).Select(x => new UserDto
-        {
-            Id = x.ObjectId,
-            Fullname = x.PersonFullname,
-            Position = x.PersonPosition?.Name
-        }));
+        return Ok((await _userService.GetSubordinates(SessionData.UserId)).Select(x => new UserDto(x)));
     }
 }

@@ -2,7 +2,7 @@ using System.Xml.Linq;
 
 using StackExchange.Redis;
 
-using requete.Models;
+using requete.Models.HCM;
 
 namespace requete.Services;
 

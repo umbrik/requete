@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 
-using requete.Models;
+using requete.Models.HCM;
 
 namespace requete.Data;
 
@@ -14,7 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         // Get all types in the same namespace as one of your models
         var entityTypes = typeof(Account).Assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && t.Namespace == "requete.Models" && t.GetCustomAttribute<TableAttribute>() is not null);
+            .Where(t => t.IsClass && !t.IsAbstract && t.Namespace == "requete.Models.HCM" && t.GetCustomAttribute<TableAttribute>() is not null);
 
         foreach (var type in entityTypes)
         {

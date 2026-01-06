@@ -14,12 +14,6 @@ public class CoursesController(ICourseService courseService) : SessionController
     [HttpGet]
     public async Task<ActionResult<object>> GetCourses()
     {
-        return Ok((await _courseService.GetCourses()).Select(x => new CourseDto
-        {
-            Id = x.Id,
-            Code = x.Code,
-            Name = x.Name,
-            Duration = x.Duration
-        }));
+        return Ok((await _courseService.GetCourses()).Select(x => new CourseDto(x)));
     }
 }

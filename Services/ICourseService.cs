@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using requete.Data;
-using requete.Models;
+using requete.Models.HCM;
 
 namespace requete.Services;
 

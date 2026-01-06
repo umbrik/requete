@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-using requete.Models;
+using requete.Models.HCM;
 
 namespace requete.Controllers;
 

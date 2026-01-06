@@ -1,0 +1,31 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace requete.Models.HCM;
+
+[Table("mobile_app_configs")]
+public partial class MobileAppConfig
+{
+    [Key]
+    [Column("id")]
+    public long Id { get; set; }
+
+    [Column("code")]
+    [Unicode(false)]
+    public string? Code { get; set; }
+
+    [Column("name")]
+    [Unicode(false)]
+    public string? Name { get; set; }
+
+    [Column("type")]
+    [Unicode(false)]
+    public string? Type { get; set; }
+
+    [Column("use_chat")]
+    public bool? UseChat { get; set; }
+
+    [Column("modification_date", TypeName = "datetime")]
+    public DateTime? ModificationDate { get; set; }
+}

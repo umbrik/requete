@@ -7,4 +7,11 @@ public record UserDto
     public string? Position { get; set; }
 
     public UserDto() {}
+
+    public UserDto(Models.HCM.FuncManager x)
+    {
+        Id = x.ObjectId;
+        Fullname = x.PersonFullname;
+        Position = x.PersonPosition?.Name;
+    }
 }
