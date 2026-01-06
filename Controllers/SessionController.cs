@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
-using requete.Services;
 using requete.Models;
+using requete.Services;
 
 namespace requete.Controllers;
 

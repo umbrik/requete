@@ -43,6 +43,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddScoped<IRedisSessionService, RedisSessionService>();
 builder.Services.AddScoped<ILearningService, LearningService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,5 +1,6 @@
-using StackExchange.Redis;
 using System.Xml.Linq;
+
+using StackExchange.Redis;
 
 using requete.Models;
 

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-using requete.Data;
 using requete.Models;
 using requete.Services;
 
@@ -22,6 +20,6 @@ public class LearningsController(ILearningService learningService) : SessionCont
     [HttpGet("subordinates")]
     public async Task<ActionResult<object>> GetSubordinatesLearnings()
     {
-        return Ok(await _learningService.GetUserSubordinatesLearnings(SessionData.UserId));
+        return Ok(await _learningService.GetSubordinatesLearnings(SessionData.UserId));
     }
 }

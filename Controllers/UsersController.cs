@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-using requete.Data;
-using requete.Models;
-using requete.Middleware;
 using requete.DTOs.Responses;
+using requete.Models;
 using requete.Services;
 
 namespace requete.Controllers;
