@@ -6,7 +6,7 @@ public record LearningResultDto
     public string? Fullname { get; set; }
     public string? Position { get; set; }
 
-    public LearningResultDto() {}
+    public LearningResultDto() { }
 
     public LearningResultDto(Models.HCM.Learning learning)
     {

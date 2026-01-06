@@ -12,7 +12,7 @@ public record CourseDto
 
     public long? Duration { get; set; }
 
-    public CourseDto() {}
+    public CourseDto() { }
 
     public CourseDto(Course x)
     {

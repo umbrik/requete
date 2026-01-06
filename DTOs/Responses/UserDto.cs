@@ -6,7 +6,7 @@ public record UserDto
     public string? Fullname { get; set; }
     public string? Position { get; set; }
 
-    public UserDto() {}
+    public UserDto() { }
 
     public UserDto(Models.HCM.FuncManager x)
     {

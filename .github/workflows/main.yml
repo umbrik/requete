@@ -120,8 +120,8 @@ jobs:
     - name: Build
       run: dotnet build requete.sln --configuration Release --no-restore
 
-  pr-summary:
-    name: PR Summary
+  checks-summary:
+    name: Checks Summary
     needs: [build-and-test, code-quality, security-scan, multi-os-compatibility]
     runs-on: ubuntu-latest
     if: always()
@@ -133,10 +133,10 @@ jobs:
               "${{ needs.code-quality.result }}" == "success" &&
               "${{ needs.security-scan.result }}" == "success" &&
               "${{ needs.multi-os-compatibility.result }}" == "success" ]]; then
-          echo "✅ All PR checks passed successfully!"
+          echo "✅ All checks passed successfully!"
           exit 0
         else
-          echo "❌ Some PR checks failed:"
+          echo "❌ Some checks failed:"
           echo "Build and Test: ${{ needs.build-and-test.result }}"
           echo "Code Quality: ${{ needs.code-quality.result }}"
           echo "Security Scan: ${{ needs.security-scan.result }}"
