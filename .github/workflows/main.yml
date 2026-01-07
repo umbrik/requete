@@ -1,5 +1,12 @@
 name: Main
 
+permissions:
+  contents: write
+  packages: write
+  issues: read
+  checks: read
+  actions: read
+
 on:
   pull_request:
     branches: [ main ]
@@ -191,11 +198,15 @@ jobs:
         fi
 
     - name: Upload release assets
-      uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.${{ matrix.runtime == 'win-x64' && 'zip' || 'tar.gz' }}
-        asset_name: requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.${{ matrix.runtime == 'win-x64' && 'zip' || 'tar.gz' }}
-        asset_content_type: ${{ matrix.runtime == 'win-x64' && 'application/zip' || 'application/gzip' }}
+      run: |
+        if [[ "${{ matrix.runtime }}" == win-* ]]; then
+          ASSET_FILE="requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.zip"
+        else
+          ASSET_FILE="requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.tar.gz"
+        fi
+
+        gh release upload ${{ github.event.release.tag_name }} "$ASSET_FILE" \
+          --repo ${{ github.repository }} \
+          --clobber
