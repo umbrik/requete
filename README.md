@@ -103,6 +103,46 @@ Redis используется для:
 
 - `SessionAuthenticationMiddleware` - Middleware для аутентификации сессий
 
+## Аутентификация
+
+Приложение использует простую систему аутентификации на основе сессий с использованием Redis:
+
+### Принцип работы
+
+1. **Cookie-based аутентификация**: Система использует cookie с именем `SessionID` для передачи идентификатора сессии
+2. **Redis-хранилище**: Все сессии хранятся в Redis и проверяются при каждом запросе
+3. **Middleware проверка**: `SessionAuthenticationMiddleware` перехватывает все входящие запросы и проверяет наличие действующей сессии
+
+### Процесс аутентификации
+
+1. **Получение SessionID**: Middleware извлекает `SessionID` из cookies запроса
+2. **Проверка в Redis**: Выполняется запрос к Redis для поиска данных сессии по ключу SessionID
+3. **Создание Claims**: При найденной сессии создаются claims с `SessionId` и `UserId`
+4. **Установка контекста**: Данные сессии сохраняются в `HttpContext.Items["SessionData"]`
+
+### Исключения
+
+Middleware пропускает проверку аутентификации для:
+- Статических файлов (favicon.ico)
+- API документации (`/scalar/v1`, `/openapi/v1.json`)
+- OPTIONS запросов
+- Эндпоинтов с атрибутом `[AllowAnonymous]`
+
+### Использование в контроллерах
+
+Все контроллеры наследуются от `SessionControllerBase`, который предоставляет доступ к данным текущей сессии через свойство `SessionData`.
+
+```csharp
+public class MyController : SessionControllerBase
+{
+    public IActionResult GetUserData()
+    {
+        var userId = SessionData.UserId; // Доступ к данным сессии
+        // ...
+    }
+}
+```
+
 ## API Документация
 
 После запуска приложения документация API доступна по адресу:
