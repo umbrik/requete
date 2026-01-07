@@ -13,6 +13,8 @@ on:
       - '**.md'
       - 'docs/**'
       - '.gitignore'
+  release:
+    types: [created]
 
 jobs:
   build-and-test:
@@ -143,3 +145,57 @@ jobs:
           echo "Multi-OS Build: ${{ needs.multi-os-compatibility.result }}"
           exit 1
         fi
+
+  publish-release:
+    name: Build and Publish Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    needs: [build-and-test, code-quality, security-scan]
+
+    strategy:
+      matrix:
+        runtime: ['win-x64', 'linux-x64', 'osx-x64']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore requete.sln
+
+    - name: Build and publish
+      run: |
+        dotnet publish requete.csproj \
+          --configuration Release \
+          --runtime ${{ matrix.runtime }} \
+          --self-contained true \
+          --output ./publish/${{ matrix.runtime }} \
+          -p:PublishSingleFile=true \
+          -p:PublishTrimmed=true \
+          -p:EnableCompressionInSingleFile=true
+
+    - name: Create release archive
+      run: |
+        cd publish/${{ matrix.runtime }}
+        if [[ "${{ matrix.runtime }}" == win-* ]]; then
+          zip -r ../../requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.zip .
+        else
+          tar -czf ../../requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.tar.gz .
+        fi
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.${{ matrix.runtime == 'win-x64' && 'zip' || 'tar.gz' }}
+        asset_name: requete-${{ github.event.release.tag_name }}-${{ matrix.runtime }}.${{ matrix.runtime == 'win-x64' && 'zip' || 'tar.gz' }}
+        asset_content_type: ${{ matrix.runtime == 'win-x64' && 'application/zip' || 'application/gzip' }}
