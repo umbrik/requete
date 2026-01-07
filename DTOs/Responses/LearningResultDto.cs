@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace requete.DTOs.Responses;
 
 public record LearningResultDto
@@ -21,13 +19,15 @@ public record LearningResultDto
         CourseName = courseName;
     }
 
-    public LearningResultDto(Models.HCM.Learning learning): this(
+    public LearningResultDto(Models.HCM.Learning learning) : this(
         learning.Id,
         learning.PersonFullname,
-        learning.CourseName) { }
+        learning.CourseName)
+    { }
 
-    public LearningResultDto(Models.HCM.ActiveLearning learning): this(
+    public LearningResultDto(Models.HCM.ActiveLearning learning) : this(
         learning.Id,
         learning.PersonFullname,
-        learning.CourseName) { }
+        learning.CourseName)
+    { }
 }
