@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using requete.Models.HCM;
@@ -18,6 +19,7 @@ public class SessionController(IRedisSessionService redisService) : ControllerBa
     [ProducesResponseType(typeof(SessionData), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<ActionResult<SessionData>> GetSession()
     {
         if (!Request.Cookies.TryGetValue("SessionID", out var sessionId))

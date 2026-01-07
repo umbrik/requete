@@ -29,16 +29,19 @@ public class LearningService(AppDbContext context, IUserService userService) : I
     public async Task<List<LearningResultDto>> GetSubordinatesLearnings(long userId)
     {
         var subordinateIds = (await _userService.GetSubordinates(userId)).Select(x => x.ObjectId).Distinct().ToList();
-        var learnings = _context
+
+        var learnings = await _context
             .Set<Learning>()
             .Where(x => x.PersonId.HasValue && subordinateIds.Contains(x.PersonId.Value))
-            .Select(x => new LearningResultDto(x));
+            .Select(x => new LearningResultDto(x))
+            .ToListAsync();
 
-        var activeLearnings = _context
+        var activeLearnings = await _context
             .Set<ActiveLearning>()
             .Where(x => x.PersonId.HasValue && subordinateIds.Contains(x.PersonId.Value))
-            .Select(x => new LearningResultDto(x));
+            .Select(x => new LearningResultDto(x))
+            .ToListAsync();
 
-        return await learnings.Union(activeLearnings).ToListAsync();
+        return [.. learnings.Union(activeLearnings)];
     }
 }
